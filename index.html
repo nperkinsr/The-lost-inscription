@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A multiplayer archaeology symbol search game." />
+
+  <title>The Lost Inscription</title>
+
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="lost-inscription">
+    <section class="lobby-screen active" id="lobby-screen" aria-label="The Lost Inscription">
+      <div class="lobby-card">
+        <img class="game-logo" src="assets/images/logo.png" alt="The Lost Inscription logo" />
+        <div class="lobby-instructions">
+          <p>Race through <strong style="color:rgb(255, 223, 181)">10 rounds</strong> as archaeologists decoding a stone
+            wall.</p>
+          <p>Each round shows five symbols. Find them on your wall and click them in the <strong
+              style="color:rgb(255, 223, 181)">same order</strong>.
+          </p>
+          <p>Selecting the wrong symbol will clear your current selection and you will have to start that sequence
+            again.</p>
+          <p>When all five are correct, press <strong style="color:rgb(255, 223, 181)">Decipher Symbols</strong> to
+            reveal the hidden meaning and wait
+            for the next inscription. Faster correct submissions earn more glory.</p>
+        </div>
+
+        <div class="lobby-actions">
+          <button class="primary-action" id="choose-host-button" type="button">Host Game</button>
+          <button class="secondary-action" id="choose-join-button" type="button">Join Game</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="setup-modal" id="setup-modal" aria-labelledby="setup-title" aria-hidden="true">
+      <div class="setup-card">
+        <p class="eyebrow" id="setup-kicker">Expedition setup</p>
+        <h2 id="setup-title">Join the Room</h2>
+        <p class="setup-copy" id="setup-copy">Add your name and enter the host room code.</p>
+
+        <div class="field-grid">
+          <label>
+            Your name
+            <input id="player-name" type="text" maxlength="16" placeholder="Maya" autocomplete="name" />
+          </label>
+          <label class="room-code-field" id="room-code-field">
+            Room code
+            <input id="room-code" type="text" maxlength="12" placeholder="LI-7QK2" autocomplete="off" />
+          </label>
+          <div class="host-code-box hidden" id="host-code-box">
+            <span>Room code</span>
+            <strong id="host-code-preview">LI-----</strong>
+            <button class="secondary-action compact-action" id="copy-code-button" type="button">Copy</button>
+          </div>
+        </div>
+
+        <div class="lobby-actions">
+          <button class="primary-action" id="host-button" type="button">Create Room</button>
+          <button class="primary-action" id="join-button" type="button">Join Room</button>
+          <button class="secondary-action" id="setup-back-button" type="button">Back</button>
+        </div>
+
+        <p class="status-line setup-status" id="connection-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="game-screen" id="game-screen" aria-label="The Lost Inscription game board">
+      <header class="top-bar">
+        <div class="top-bar-inner">
+          <img class="top-logo" src="assets/images/logo.png" alt="" aria-hidden="true" />
+          <div class="round-chip" id="round-chip">Lobby</div>
+        </div>
+      </header>
+
+      <div class="play-layout">
+        <section class="board-stage" aria-label="Inscription board">
+          <div class="inscription" aria-label="Target inscription">
+            <div class="inscription-stone">
+              <p class="inscription-label">Inscription to decipher</p>
+              <div class="target-symbols" id="target-symbols"></div>
+            </div>
+          </div>
+
+          <div class="board-wrap">
+            <div class="symbol-board" id="symbol-board" aria-label="Archaeology symbol board"></div>
+          </div>
+
+          <div class="selection-slots" id="selection-slots" aria-label="Selected symbols"></div>
+
+          <div class="controls">
+            <button class="primary-action decipher-action" id="decipher-button" type="button" disabled>
+              <span>Decipher Symbols</span>
+            </button>
+          </div>
+
+          <p class="round-status" id="round-status" aria-live="polite">Waiting for the expedition to begin.</p>
+        </section>
+
+        <div class="side-column">
+          <button class="secondary-action panel-round-action host-only" id="new-round-button" type="button">
+            New Inscription
+          </button>
+          <aside class="expedition-panel" aria-label="Players online">
+            <p class="panel-kicker">Players online</p>
+            <ol class="score-list" id="score-list"></ol>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="countdown-overlay" id="countdown-overlay" aria-live="assertive" aria-hidden="true">
+    <div class="countdown-card">
+      <span class="material-symbols-outlined countdown-hourglass" id="countdown-hourglass" aria-hidden="true">
+        hourglass_empty
+      </span>
+      <span class="countdown-number" id="countdown-number">3</span>
+      <p>New inscription incoming</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="result-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+    aria-hidden="true">
+    <div class="result-dialog">
+      <button class="modal-close" id="modal-close" type="button" aria-label="Close deciphered phrase">×</button>
+      <p class="eyebrow" id="modal-title">Inscription deciphered</p>
+      <p class="modal-phrase" id="modal-phrase"></p>
+      <p class="modal-detail" id="modal-detail">Wait for the host to reveal the next inscription.</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="final-modal" role="dialog" aria-modal="true" aria-labelledby="final-title"
+    aria-hidden="true">
+    <div class="result-dialog final-dialog">
+      <p class="eyebrow">Expedition complete</p>
+      <h2 id="final-title">Congratulations! The Ancient Ones are mildly impressed</h2>
+      <ol class="final-results" id="final-results"></ol>
+      <button class="primary-action" id="home-button" type="button">Back to Home</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <script src="scripts.js"></script>
+</body>
+
+</html>
